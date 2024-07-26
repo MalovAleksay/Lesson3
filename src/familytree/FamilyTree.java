@@ -1,26 +1,25 @@
 package familytree;
 
-import familytree.model.Human;
-import familytree.utils.HumanComparator;
+import familytree.utils.FamilyMemberComparator;
 import java.util.*;
 
-public class FamilyTree implements Iterable<Human> {
-    private List<Human> family;
+public class FamilyTree<T extends FamilyMember> implements Iterable<T> {
+    private List<T> family;
 
     public FamilyTree() {
         this.family = new ArrayList<>();
     }
 
-    public void addHuman(Human human) {
-        family.add(human);
+    public void addMember(T member) {
+        family.add(member);
     }
 
-    public void sort(HumanComparator.SortCriteria criteria) {
-        family.sort(new HumanComparator(criteria));
+    public void sort(FamilyMemberComparator.SortCriteria criteria) {
+        family.sort(new FamilyMemberComparator<>(criteria));
     }
 
     @Override
-    public Iterator<Human> iterator() {
+    public Iterator<T> iterator() {
         return family.iterator();
     }
 
