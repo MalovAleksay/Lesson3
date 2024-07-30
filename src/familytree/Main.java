@@ -1,25 +1,27 @@
 package familytree;
 
+import familytree.model.FamilyTree;
 import familytree.model.Human;
 import familytree.model.Gender;
+import familytree.view.ConsoleView;
+import familytree.view.FamilyTreeView;
+import familytree.presenter.FamilyTreePresenter;
 
 import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) {
-        FamilyMemberFactory<Human> humanFactory = (id, name, gender, birthDate) ->
-                new Human(id, name, gender.equals("M") ? Gender.MALE : Gender.FEMALE, birthDate);
+        FamilyTree model = new FamilyTree();
+        initializeWithPredefinedData(model);
 
-        UserInterface<Human> ui = new UserInterface<>(humanFactory);
+        FamilyTreeView view = new ConsoleView();
+        FamilyTreePresenter presenter = new FamilyTreePresenter(model, view);
 
-
-        initializeTreeWithPredefinedData(ui.getFamilyTree());
-
-        ui.start();
+        presenter.run();
     }
 
-    private static void initializeTreeWithPredefinedData(FamilyTree<Human> familyTree) {
-
+    private static void initializeWithPredefinedData(FamilyTree familyTree) {
+        // Создаем членов семьи
         Human grandfather = new Human(1, "Иван", Gender.MALE, LocalDate.of(1940, 5, 15));
         Human grandmother = new Human(2, "Мария", Gender.FEMALE, LocalDate.of(1942, 8, 20));
         Human father = new Human(3, "Петр", Gender.MALE, LocalDate.of(1965, 3, 10));
@@ -31,47 +33,47 @@ public class Main {
         Human cousin1 = new Human(9, "Дмитрий", Gender.MALE, LocalDate.of(1995, 4, 22));
         Human cousin2 = new Human(10, "Екатерина", Gender.FEMALE, LocalDate.of(1997, 12, 7));
 
+        // Устанавливаем связи
+        grandfather.setSpouseId(grandmother.getId());
+        grandmother.setSpouseId(grandfather.getId());
 
-        grandfather.setSpouse(grandmother);
-        grandmother.setSpouse(grandfather);
+        father.setFatherId(grandfather.getId());
+        father.setMotherId(grandmother.getId());
+        father.setSpouseId(mother.getId());
+        grandfather.addChildId(father.getId());
+        grandmother.addChildId(father.getId());
 
-        father.setFather(grandfather);
-        father.setMother(grandmother);
-        father.setSpouse(mother);
-        grandfather.addChild(father);
-        grandmother.addChild(father);
+        mother.setSpouseId(father.getId());
 
-        mother.setSpouse(father);
+        uncle.setFatherId(grandfather.getId());
+        uncle.setMotherId(grandmother.getId());
+        uncle.setSpouseId(aunt.getId());
+        grandfather.addChildId(uncle.getId());
+        grandmother.addChildId(uncle.getId());
 
-        uncle.setFather(grandfather);
-        uncle.setMother(grandmother);
-        uncle.setSpouse(aunt);
-        grandfather.addChild(uncle);
-        grandmother.addChild(uncle);
+        aunt.setSpouseId(uncle.getId());
 
-        aunt.setSpouse(uncle);
+        son.setFatherId(father.getId());
+        son.setMotherId(mother.getId());
+        father.addChildId(son.getId());
+        mother.addChildId(son.getId());
 
-        son.setFather(father);
-        son.setMother(mother);
-        father.addChild(son);
-        mother.addChild(son);
+        daughter.setFatherId(father.getId());
+        daughter.setMotherId(mother.getId());
+        father.addChildId(daughter.getId());
+        mother.addChildId(daughter.getId());
 
-        daughter.setFather(father);
-        daughter.setMother(mother);
-        father.addChild(daughter);
-        mother.addChild(daughter);
+        cousin1.setFatherId(uncle.getId());
+        cousin1.setMotherId(aunt.getId());
+        uncle.addChildId(cousin1.getId());
+        aunt.addChildId(cousin1.getId());
 
-        cousin1.setFather(uncle);
-        cousin1.setMother(aunt);
-        uncle.addChild(cousin1);
-        aunt.addChild(cousin1);
+        cousin2.setFatherId(uncle.getId());
+        cousin2.setMotherId(aunt.getId());
+        uncle.addChildId(cousin2.getId());
+        aunt.addChildId(cousin2.getId());
 
-        cousin2.setFather(uncle);
-        cousin2.setMother(aunt);
-        uncle.addChild(cousin2);
-        aunt.addChild(cousin2);
-
-
+        // Добавляем всех членов семьи в дерево
         familyTree.addMember(grandfather);
         familyTree.addMember(grandmother);
         familyTree.addMember(father);
