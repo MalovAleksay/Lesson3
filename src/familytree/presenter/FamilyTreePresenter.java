@@ -1,20 +1,18 @@
 package familytree.presenter;
 
-import familytree.model.FamilyTree;
-import familytree.model.Human;
-import familytree.model.FileDataManager;
+import familytree.model.FamilyMember;
+import familytree.service.FamilyTreeService;
 import familytree.view.FamilyTreeView;
 import familytree.utils.FamilyMemberComparator;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FamilyTreePresenter {
-    private FamilyTree model;
+    private FamilyTreeService service;
     private FamilyTreeView view;
 
-    public FamilyTreePresenter(FamilyTree model, FamilyTreeView view) {
-        this.model = model;
+    public FamilyTreePresenter(FamilyTreeService service, FamilyTreeView view) {
+        this.service = service;
         this.view = view;
     }
 
@@ -38,10 +36,12 @@ public class FamilyTreePresenter {
                     sortFamilyTree();
                     break;
                 case 5:
-                    saveData();
+                    service.saveData();
+                    view.displayMessage("Данные успешно сохранены.");
                     break;
                 case 6:
-                    loadData();
+                    service.loadData();
+                    view.displayMessage("Данные успешно загружены.");
                     break;
                 case 7:
                     running = false;
@@ -52,47 +52,36 @@ public class FamilyTreePresenter {
         }
     }
 
-
     private void addFamilyMember() {
-        Human newMember = view.getNewFamilyMemberInfo();
-        model.addMember(newMember);
+        FamilyMember newMember = view.getNewFamilyMemberInfo();
+        service.addMember(newMember);
         view.displayMessage("Член семьи успешно добавлен в семейное древо.");
     }
 
     private void displayFamilyTree() {
-        List<Human> members = model.getAllMembers();
+        List<FamilyMember> members = service.getAllMembers();
         view.displayFamilyTree(members);
     }
 
     private void showMemberRelations() {
         int memberId = view.getMemberIdForRelations();
-        Human member = model.getMember(memberId);
+        FamilyMember member = service.getMember(memberId);
         if (member != null) {
-            Human spouse = model.getMember(member.getSpouseId());
-            Human mother = model.getMember(member.getMotherId());
-            Human father = model.getMember(member.getFatherId());
-            List<Human> children = member.getChildrenIds().stream()
-                    .map(model::getMember)
-                    .collect(Collectors.toList());
+            FamilyMember spouse = service.getMember(member.getSpouseId());
+            FamilyMember mother = service.getMember(member.getMotherId());
+            FamilyMember father = service.getMember(member.getFatherId());
+            List<FamilyMember> children = member.getChildrenIds().stream()
+                    .map(service::getMember)
+                    .toList();
             view.displayRelations(member, spouse, mother, father, children);
         } else {
             view.displayMessage("Член семьи с указанным ID не найден.");
         }
     }
 
-    private void saveData() {
-        FileDataManager.saveToFile(model.getAllMembers());
-        view.displayMessage("Данные успешно сохранены.");
-    }
-
-    private void loadData() {
-        model.clear();
-        FileDataManager.loadFromFile(model);
-        view.displayMessage("Данные успешно загружены.");
-    }
     private void sortFamilyTree() {
         FamilyMemberComparator.SortCriteria criteria = view.getSortCriteria();
-        model.sort(criteria);
+        service.sortMembers(criteria);
         view.displayMessage("Семейное древо отсортировано.");
         displayFamilyTree();
     }

@@ -1,5 +1,6 @@
 package familytree.view;
 
+import familytree.model.FamilyMember;
 import familytree.model.Gender;
 import familytree.model.Human;
 import familytree.utils.FamilyMemberComparator;
@@ -33,7 +34,7 @@ public class ConsoleView implements FamilyTreeView {
     }
 
     @Override
-    public Human getNewFamilyMemberInfo() {
+    public FamilyMember getNewFamilyMemberInfo() {
         System.out.print("Введите ID: ");
         int id = Integer.parseInt(scanner.nextLine());
         System.out.print("Введите имя: ");
@@ -42,14 +43,13 @@ public class ConsoleView implements FamilyTreeView {
         Gender gender = scanner.nextLine().equalsIgnoreCase("M") ? Gender.MALE : Gender.FEMALE;
         System.out.print("Введите дату рождения (yyyy-MM-dd): ");
         LocalDate birthDate = LocalDate.parse(scanner.nextLine());
-
         return new Human(id, name, gender, birthDate);
     }
 
     @Override
-    public void displayFamilyTree(List<Human> members) {
+    public void displayFamilyTree(List<FamilyMember> members) {
         System.out.println("\nСемейное древо:");
-        for (Human member : members) {
+        for (FamilyMember member : members) {
             System.out.println(member);
         }
     }
@@ -66,14 +66,14 @@ public class ConsoleView implements FamilyTreeView {
     }
 
     @Override
-    public void displayRelations(Human member, Human spouse, Human mother, Human father, List<Human> children) {
+    public void displayRelations(FamilyMember member, FamilyMember spouse, FamilyMember mother, FamilyMember father, List<FamilyMember> children) {
         System.out.println("\nСвязи для " + member.getName() + ":");
         System.out.println("Супруг(а): " + (spouse != null ? spouse.getName() : "нет"));
         System.out.println("Мать: " + (mother != null ? mother.getName() : "неизвестна"));
         System.out.println("Отец: " + (father != null ? father.getName() : "неизвестен"));
         System.out.println("Дети: " + (children.isEmpty() ?
                 "отсутствуют" :
-                String.join(", ", children.stream().map(Human::getName).toArray(String[]::new))));
+                String.join(", ", children.stream().map(FamilyMember::getName).toArray(String[]::new))));
     }
 
     @Override

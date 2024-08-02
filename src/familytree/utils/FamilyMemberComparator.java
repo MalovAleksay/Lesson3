@@ -3,7 +3,7 @@ package familytree.utils;
 import familytree.model.FamilyMember;
 import java.util.Comparator;
 
-public class FamilyMemberComparator<T extends FamilyMember> implements Comparator<T> {
+public class FamilyMemberComparator implements Comparator<FamilyMember> {
     private SortCriteria criteria;
 
     public enum SortCriteria {
@@ -15,7 +15,7 @@ public class FamilyMemberComparator<T extends FamilyMember> implements Comparato
     }
 
     @Override
-    public int compare(T m1, T m2) {
+    public int compare(FamilyMember m1, FamilyMember m2) {
         switch (criteria) {
             case BY_NAME:
                 return m1.getName().compareTo(m2.getName());
